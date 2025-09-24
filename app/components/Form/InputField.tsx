@@ -3,16 +3,14 @@ import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 type InputFieldProps = {
-  label?: string;
-  placeholder?: string;
-  type?: "text" | "email" | "password" | "tel" | "number";
+  placeholder: string;
+  type: "text" | "email" | "password" | "tel" | "number";
   required?: boolean;
   registration: UseFormRegisterReturn;
   error?: FieldError;
 };
 
 const InputField: React.FC<InputFieldProps> = ({
-  label,
   placeholder,
   type = "text",
   registration,

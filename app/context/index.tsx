@@ -8,8 +8,7 @@ import {
   useContext,
   useState,
 } from "react";
-import { VerifiedUserResType } from "../utils/types/signup";
-import { UserType } from "../utils/types/user";
+import { Student } from "../utils/types/student";
 
 interface ContextValue {
   expanded: boolean;
@@ -20,10 +19,8 @@ interface ContextValue {
   setActiveModalId: (id: string | null) => void;
   page: number;
   setPage: Dispatch<SetStateAction<number>>;
-  User: VerifiedUserResType | null;
-  setUser: (user: VerifiedUserResType) => void;
-  profile: UserType | null;
-  setProfile: (user: UserType) => void;
+  profile: Student | null;
+  setProfile: (profile: Student) => void;
 }
 
 const AppContext = createContext<ContextValue>({} as ContextValue);
@@ -34,8 +31,7 @@ function ContextProvider({ children }: PropsWithChildren) {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [page, setPage] = useState(1);
-  const [User, setUser] = useState<VerifiedUserResType | null>(null);
-  const [profile, setProfile] = useState<UserType | null>(null);
+  const [profile, setProfile] = useState<Student | null>(null);
 
   return (
     <AppContext.Provider
@@ -48,8 +44,6 @@ function ContextProvider({ children }: PropsWithChildren) {
         setActiveTab,
         activeModalId,
         setActiveModalId,
-        User,
-        setUser,
         profile,
         setProfile,
       }}

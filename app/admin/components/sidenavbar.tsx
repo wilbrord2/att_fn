@@ -11,8 +11,8 @@ import { useAppContext } from "../../context";
 import Link from "next/link";
 import { SiGoogleclassroom } from "react-icons/si";
 import { VscFeedback } from "react-icons/vsc";
-
-// import { GetProfileApi } from "@/app/api/auth/profile";
+import { RiAdminFill } from "react-icons/ri";
+import { GetProfileApi } from "@/app/api/students/action";
 
 const SideBarNav = () => {
   const today = new Date().toLocaleDateString("en-GB", {
@@ -28,9 +28,10 @@ const SideBarNav = () => {
 
   const navItems = [
     { label: "Dashboard", icon: HiOutlineHome, href: "/admin/dashboard" },
-    { label: "Student", icon: PiStudentFill, href: "/admin/student" },
-    { label: "Classroom", icon: SiGoogleclassroom, href: "/admin/classroom" },
     { label: "Feedback", icon: VscFeedback, href: "/admin/feedback" },
+    { label: "Classroom", icon: SiGoogleclassroom, href: "/admin/classroom" },
+    { label: "Student", icon: PiStudentFill, href: "/admin/student" },
+    { label: "Admins", icon: RiAdminFill, href: "/admin/list" },
     { label: "Logout", icon: IoMdLogOut, href: "#" },
   ];
 
@@ -46,10 +47,10 @@ const SideBarNav = () => {
   }, []);
 
   const handleGetProfile = async () => {
-    // const result = await GetProfileApi();
-    // if (result.success && result.data) {
-    //   setProfile(result.data);
-    // }
+    const result = await GetProfileApi();
+    if (result.success && result.data) {
+      setProfile(result.data);
+    }
   };
 
   return (
@@ -84,7 +85,7 @@ const SideBarNav = () => {
                       type: "spring",
                       stiffness: 500,
                       damping: 30,
-                      duration:0.5,
+                      duration: 0.5,
                     }}
                   />
                 )}

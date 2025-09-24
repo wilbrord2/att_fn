@@ -3,11 +3,49 @@ import { Student, StudentType } from "@/app/utils/types/student";
 import createAxiosInstance from "..";
 import { cookies } from "next/headers";
 
+export const GetProfileApi = async (): Promise<{
+  success: boolean;
+  data?: Student;
+  error?: string;
+}> => {
+  const token = (await cookies()).get("accessToken")?.value;
+  const api = createAxiosInstance(token);
+  try {
+    const response = await api.get("/v1/student/profile");
+    const data = response.data;
+
+    if (response.data) {
+      return { success: true, data: data.student };
+    } else {
+      return { success: false, error: "Fetching student failed" };
+    }
+  } catch (error: any) {
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
+
 export const GetAllStudentApi = async (): Promise<{success: boolean;data?: StudentType;error?: string;}> => {
   const token = (await cookies()).get("accessToken")?.value;
   const api = createAxiosInstance(token);
   try {
     const response = await api.get("/v1/student");
+    const data = response.data;
+  
+    if (response.data) {
+      return { success: true, data: data };
+    } else {
+      return { success: false, error: "Fetching student failed" };
+    }
+  } catch (error: any) {
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
+
+export const GetAllAdminsApi = async (): Promise<{success: boolean;data?: StudentType;error?: string;}> => {
+  const token = (await cookies()).get("accessToken")?.value;
+  const api = createAxiosInstance(token);
+  try {
+    const response = await api.get("/v1/student/admins");
     const data = response.data;
   
     if (response.data) {
