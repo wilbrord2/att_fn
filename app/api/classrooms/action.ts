@@ -26,6 +26,29 @@ export const GetStudentClassApi = async (): Promise<{
   }
 };
 
+export const GetClassApi = async (
+  classId: number
+): Promise<{
+  success: boolean;
+  data?: { message: string; classroom: Classroom };
+  error?: string;
+}> => {
+  const token = (await cookies()).get("accessToken")?.value;
+  const api = createAxiosInstance(token);
+  try {
+    const response = await api.get(`/v1/class/${classId}`);
+    const data = response.data;
+
+    if (response.data) {
+      return { success: true, data: data };
+    } else {
+      return { success: false, error: "Fetching student failed" };
+    }
+  } catch (error: any) {
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
+
 export const CreateClassroomApi = async (
   classroomdata: CreateClassFormValues
 ): Promise<{

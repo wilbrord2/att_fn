@@ -61,7 +61,7 @@ export default function CreateClassForm() {
   }, [errorMessage]);
 
   return (
-    <div className=" bg-white min-w-[500px] h-[90vh] w-full overflow-y-scroll rounded-md p-4 md:p-8 flex items-center justify-center">
+    <div className=" bg-white min-w-[500px]  w-full overflow-y-scroll rounded-md p-4 md:p-8 flex items-center justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-lg space-y-6"

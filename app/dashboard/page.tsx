@@ -3,18 +3,32 @@ import React, { useEffect, useState } from "react";
 import StudentDashboardTemplate from "./StudentDashboardTemplate";
 import { useAppContext } from "../context";
 import { GetStudentClassApi } from "../api/classrooms/action";
-import { Classroom, ClassroomType } from "../utils/types/classRooms";
+import { Classroom } from "../utils/types/classRooms";
 import Title from "../components/titles/title";
 import Loading from "../loading";
 import ClassCard from "../components/cards/classroomCard";
 import CreateClassCard from "../components/cards/createClassCard";
 import CenterModal from "../components/model/centerModel";
 import CreateClassForm from "../components/classrooms/createClassrooms";
+import { useRouter } from "next/navigation";
 
 const Dashborad = () => {
   const { profile, activeModalId, setActiveModalId } = useAppContext();
   const [classRooms, setClassRooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [greeting, setGreeting] = useState("Welcome");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting("Good morning");
+    } else if (hour < 18) {
+      setGreeting("Good afternoon");
+    } else {
+      setGreeting("Good evening");
+    }
+  }, []);
 
   useEffect(() => {
     handleGetClassrooms();
@@ -36,27 +50,31 @@ const Dashborad = () => {
 
   return (
     <StudentDashboardTemplate>
-      <div className="space-y-4 p-4 md:p-6">
+      <div className="space-y-6 p-4 md:p-6">
         <div className="w-full bg-white rounded-lg ">
-          <h2 className="text-2xl font-bold text-gray-700">
+          <h2 className="text-2xl font-bold text-gray-800">
             Class Rep Dashboard
           </h2>
-          <p className="mt-2 text-slate-500 text-xs md:text-sm leading-relaxed max-w-xl">
-            Welcome back,{" "}
+          <p className="mt-2 text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
+            {greeting},{" "}
             <span className="font-semibold text-green-600 capitalize">
               {profile?.name} 👋
             </span>
-            . Share your feedback on today’s class to help improve teaching and
-            learning experiences.
+            . Use this space to share your class feedback, review teachers, and
+            track learning progress — helping improve the overall academic
+            experience.
           </p>
         </div>
 
-        <Title title="My Class" description="my classroms" />
+        <Title
+          title="My Classes"
+          description="Your classrooms, reviews, and schedules — manage teacher feedback and class timings here."
+        />
 
         {loading ? (
           <Loading />
         ) : (
-          <div className="flex items-center gap-4 flex-wrap w-full h-full">
+          <div className="flex items-center gap-8 flex-wrap w-full h-full">
             {classRooms.map((room) => (
               <ClassCard
                 key={room.id}
@@ -67,7 +85,10 @@ const Dashborad = () => {
                 department={room.department}
                 status={room.class_status}
                 createdAt={room.created_at}
-                onClick={() => console.log("Class clicked")}
+                onClick={() => {
+                  console.log("Class clicked :", room.id, room.class_label);
+                  router.push(`/dashboard/classroom/${room.id}`);
+                }}
               />
             ))}
             <CreateClassCard

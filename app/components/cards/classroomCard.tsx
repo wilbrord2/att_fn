@@ -10,7 +10,7 @@ type ClassCardProps = {
   status: string;
   createdAt?: string;
   updatedAt?: string;
-  onClick?: () => void;
+  onClick: () => void;
 };
 
 const ClassCard: React.FC<ClassCardProps> = ({
@@ -21,17 +21,21 @@ const ClassCard: React.FC<ClassCardProps> = ({
   classLabel,
   status,
   createdAt,
-  updatedAt,
   onClick,
 }) => {
   return (
     <div
-      className="bg-white border-2 border-default-green hover:scale-110 duration-200 hover:bg-yellow-50 rounded-lg shadow-md p-4 flex flex-col gap-2 hover:shadow-lg transition cursor-pointer"
-      onClick={onClick}
+      className="bg-white min-w-[300px] border-t-2 border-t-default-green hover:scale-110 duration-200 hover:bg-yellow-50 rounded-lg shadow-default-green/50 shadow-md p-4 flex flex-col gap-2 hover:shadow-lg transition cursor-pointer"
+      onClick={() => onClick()}
     >
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-bold text-gray-700">{classLabel}</h3>
-        <div className="flex flex-col px-2 py-1  ">
+      <div className="flex justify-between gap-2 items-center">
+        <div className="flex flex-col py-1">
+          <span className="text-sm text-gray-400 font-medium">
+            {classLabel}
+          </span>
+          <h3 className="text-lg font-bold text-gray-700">{department}</h3>
+        </div>
+        <div className="flex flex-col  py-1">
           <span className="text-sm text-gray-400 font-medium">Status:</span>
           <span
             className={`${
@@ -55,9 +59,6 @@ const ClassCard: React.FC<ClassCardProps> = ({
       </p>
       <p className="text-sm text-gray-700">
         <span className="font-semibold">Intake:</span> {intake}
-      </p>
-      <p className="text-sm text-gray-700">
-        <span className="font-semibold">Department:</span> {department}
       </p>
 
       {createdAt && (
