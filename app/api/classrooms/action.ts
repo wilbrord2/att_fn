@@ -3,7 +3,7 @@ import createAxiosInstance from "..";
 import { cookies } from "next/headers";
 import { Classroom, ClassroomType } from "@/app/utils/types/classRooms";
 import { CreateClassFormValues } from "@/app/components/classrooms/createClassrooms";
-import { error } from "console";
+
 
 export const GetStudentClassApi = async (): Promise<{
   success: boolean;

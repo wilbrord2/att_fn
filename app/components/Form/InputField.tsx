@@ -4,7 +4,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 type InputFieldProps = {
   placeholder: string;
-  type: "text" | "email" | "password" | "tel" | "number";
+  type: "text" | "email" | "password" | "tel" | "number"|"time";
   required?: boolean;
   registration: UseFormRegisterReturn;
   error?: FieldError;

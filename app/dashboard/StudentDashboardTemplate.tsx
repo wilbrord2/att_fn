@@ -3,7 +3,7 @@ import Mainnavbar from "../admin/components/navbar";
 
 const StudentDashboardTemplate = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="relative p-4 space-y-4 bg-[#b4b453] ">
+    <div className="relative p-4 space-y-4 bg-[#f2f2c2] ">
       {" "}
       <Mainnavbar />
       <main className="flex items-start gap-8 h-[85vh] overflow-hidden">

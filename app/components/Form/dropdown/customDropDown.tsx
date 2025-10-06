@@ -39,7 +39,7 @@ const CustomDropDown: FC<CustomDropDownProps> = ({
       {/* Trigger */}
       <button
         type="button"
-        className="flex items-center justify-between w-full gap-2 p-4 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#600509]"
+        className="flex items-center justify-between w-full gap-2 p-4 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-default-green"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-2 text-sm font-medium text-gray-700">

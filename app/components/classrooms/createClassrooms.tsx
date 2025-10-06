@@ -26,7 +26,7 @@ export type CreateClassFormValues = z.infer<typeof classSchema>;
 export default function CreateClassForm() {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const {activeModalId, setActiveModalId } = useAppContext();
+  const { activeModalId, setActiveModalId } = useAppContext();
 
   const {
     register,
@@ -38,12 +38,11 @@ export default function CreateClassForm() {
   });
 
   const onSubmit = async (data: CreateClassFormValues) => {
-
     try {
       const result = await CreateClassroomApi(data);
-   
+
       if (result.success) {
-        router.push("/dashboard");
+        router.refresh();
         setActiveModalId(null);
       } else {
         setErrorMessage("Failed to create classroom");
@@ -61,7 +60,7 @@ export default function CreateClassForm() {
   }, [errorMessage]);
 
   return (
-    <div className=" bg-white min-w-[500px]  w-full overflow-y-scroll rounded-md p-4 md:p-8 flex items-center justify-center">
+    <div className=" bg-white sm:min-w-[500px]  w-full overflow-y-scroll rounded-md p-4 md:p-8 flex items-center justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-lg space-y-6"
