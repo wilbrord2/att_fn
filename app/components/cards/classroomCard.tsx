@@ -52,7 +52,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
       </div>
 
       <p className="text-sm text-gray-700">
-        <span className="font-semibold">Year:</span> {yearLevel}
+        <span className="font-semibold">Level:</span> {yearLevel}
       </p>
       <p className="text-sm text-gray-700">
         <span className="font-semibold">Academic Year:</span> {academicYear}

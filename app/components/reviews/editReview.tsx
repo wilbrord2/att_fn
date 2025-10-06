@@ -10,10 +10,11 @@ import InputField from "../Form/InputField";
 import ErrorCard from "../Form/error";
 import Button from "../Button/greenButton";
 import CustomDropDown from "../Form/dropdown/customDropDown";
-import { CreateReviewApi } from "@/app/api/reviewsApi/action";
+import { EditReviewApi, GetReviewApi } from "@/app/api/reviewsApi/action";
 import { useAppContext } from "@/app/context";
+import Loading from "@/app/loading";
 
-// Schema
+// ✅ Schema
 const reviewSchema = z.object({
   semester: z.string().min(1, "Semester is required"),
   lecture: z.string().min(2, "Lecture is required"),
@@ -24,34 +25,42 @@ const reviewSchema = z.object({
   end_at: z.string().regex(/^\d{2}:\d{2}$/, "End time must be in HH:mm"),
 });
 
-export type CreateReviewFormValues = z.infer<typeof reviewSchema>;
+export type EditReviewFormValues = z.infer<typeof reviewSchema>;
 
-export default function CreateReviewForm({ classId }: { classId?: number }) {
+export default function EditReviewForm({ reviewId }: { reviewId: number }) {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setActiveModalId } = useAppContext();
+  const [reviewLoading, setReviewLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     control,
+    reset,
+    getValues,
     formState: { errors, isSubmitting },
-  } = useForm<CreateReviewFormValues>({
+  } = useForm<EditReviewFormValues>({
     resolver: zodResolver(reviewSchema),
   });
 
-  const onSubmit = async (data: CreateReviewFormValues) => {
+  const onSubmit = async (data: EditReviewFormValues) => {
     try {
-      const result = await CreateReviewApi(data, classId);
-      console.log({ result });
-      if (result.success) {
-        setActiveModalId(null);
-        router.refresh();
+      const result = await EditReviewApi(data, reviewId);
+
+      if (result.success && result.data) {
+        setErrorMessage(result.data.message);
+        const timer = setTimeout(() => {
+          setActiveModalId(null);
+          router.refresh();
+          reset();
+        }, 3000);
+        return () => clearTimeout(timer);
       } else {
-        setErrorMessage(result.error?.message || "Failed to create review");
+        setErrorMessage("Failed to update review");
       }
     } catch (error) {
-      setErrorMessage("Error creating review");
+      setErrorMessage("Error updating review");
     }
   };
 
@@ -62,12 +71,42 @@ export default function CreateReviewForm({ classId }: { classId?: number }) {
     }
   }, [errorMessage]);
 
+  useEffect(() => {
+    const handleGetReviews = async () => {
+      setReviewLoading(true);
+      try {
+        const result = await GetReviewApi(reviewId);
+        if (result.success && result.data) {
+          reset({
+            class_period: result.data.class_period || "",
+            end_at: result.data.end_at || "",
+            lecture: result.data.lecture || "",
+            review: result.data.review || "",
+            semester: result.data.semester || "",
+            start_at: result.data.start_at || "",
+            teacher_fullname: result.data.teacher_fullname || "",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setReviewLoading(false);
+      }
+    };
+
+    handleGetReviews();
+  }, [reviewId, reset]);
+
+  if (reviewLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="bg-white w-full max-w-2xl min-w-[400px] sm:min-w-[500px] rounded-md p-4 md:p-8">
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
         <Title
-          title="Create Review"
-          description="Share feedback about your class session"
+          title="Edit Your Class Feedback"
+          description="Edit feedback about your class session"
         />
 
         <InputField
@@ -107,6 +146,7 @@ export default function CreateReviewForm({ classId }: { classId?: number }) {
             />
           )}
         />
+
         <>
           <h1 className="text-sm text-gray-500 font-semibold">
             Specify the start and end time of the class.
@@ -140,7 +180,7 @@ export default function CreateReviewForm({ classId }: { classId?: number }) {
         {errorMessage && <ErrorCard errorMessage={errorMessage} />}
 
         <Button
-          title={isSubmitting ? "Submitting..." : "Submit Review"}
+          title={isSubmitting ? "Submitting..." : "Update Review"}
           disabled={isSubmitting}
           type="submit"
         />

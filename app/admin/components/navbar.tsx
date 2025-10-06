@@ -7,17 +7,20 @@ import { useAppContext } from "@/app/context";
 import Link from "next/link";
 import { FaCaretDown } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
+import { Logout } from "@/app/api/auth/logout";
+import { useRouter } from "next/navigation";
 
 const studentNavItems = [
   { title: "Home", link: "/dashboard" },
   { title: "Profile", link: "/setting" },
-  { title: "Logout", link: "/" },
+  { title: "Logout", link: "#" },
 ];
 
 const Mainnavbar = () => {
   const { profile, setProfile } = useAppContext();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     handleGetProfile();
@@ -30,7 +33,14 @@ const Mainnavbar = () => {
     }
   };
 
-  // Close dropdown when clicking outside
+  const handlelogout = async () => {
+    const result = await Logout();
+    if (result) {
+      router.push("/");
+      setOpen(false);
+    }
+  };
+ 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -101,7 +111,11 @@ const Mainnavbar = () => {
           >
             {studentNavItems.map((item, idx) => (
               <Link
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  item.title.includes("Logout")
+                    ? handlelogout()
+                    : setOpen(false);
+                }}
                 key={idx}
                 href={item.link}
                 className="p-2 rounded border-b border-b-gray-200 last:border-0 font-semibold text-gray-700 hover:bg-default-yellow/70 hover:text-default-green transition-colors"

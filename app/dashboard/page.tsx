@@ -86,14 +86,15 @@ const Dashborad = () => {
                 status={room.class_status}
                 createdAt={room.created_at}
                 onClick={() => {
-                  console.log("Class clicked :", room.id, room.class_label);
                   router.push(`/dashboard/classroom/${room.id}`);
                 }}
               />
             ))}
-            <CreateClassCard
-              onClick={() => setActiveModalId("create-classroom")}
-            />
+            {classRooms.length < 4 && (
+              <CreateClassCard
+                onClick={() => setActiveModalId("create-classroom")}
+              />
+            )}
           </div>
         )}
       </div>

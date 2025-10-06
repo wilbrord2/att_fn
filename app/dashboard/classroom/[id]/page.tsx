@@ -15,6 +15,8 @@ import CenterModal from "@/app/components/model/centerModel";
 import CreateReviewForm from "@/app/components/reviews/createreviewsForm";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import ViewReview from "@/app/components/reviews/viewReview";
+import EditReviewForm from "@/app/components/reviews/editReview";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -24,18 +26,22 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   const [classRooms, setClassRooms] = useState<Classroom>();
   const [classReviews, setClassReviews] = useState<Review[]>([]);
+  const [review, setReview] = useState<{ id: number; review: string }>({
+    id: 1,
+    review: "",
+  });
   const [loading, setLoading] = useState(true);
   const [reviewLoading, setReviewLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const router = useRouter();
-  const { activeModalId, setActiveModalId } = useAppContext();
+  const { setActiveModalId } = useAppContext();
 
   useEffect(() => {
     handleGetClassrooms();
     handleGetReviews();
-  }, [activeModalId]);
+  }, []);
 
   const handleGetClassrooms = async () => {
     setLoading(true);
@@ -144,6 +150,7 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
         )}
 
         {/* Review Table */}
+        {/* Review Table / Cards */}
         <div className="bg-white shadow rounded-lg p-4 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-gray-800 mb-3">
@@ -152,7 +159,7 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <motion.button
               onClick={() => setActiveModalId("create-review")}
               whileTap={{ scale: 0.9 }}
-              className="px-4 py-2 border border-default-green rounded-lg text-default-green font-semibold text-sm cursor-pointer hover:bg-default-green hover:text-white transition-colors duration-300 "
+              className="px-4 py-2 border border-default-green rounded-lg text-default-green font-semibold text-sm cursor-pointer hover:bg-default-green hover:text-white transition-colors duration-300"
             >
               + Add Review
             </motion.button>
@@ -161,15 +168,16 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
           {reviewLoading ? (
             <Loading />
           ) : classReviews.length === 0 ? (
-            <p className="flex items-center justify-center w-ful text-slate-500 h-[300px] py-4">
+            <p className="flex items-center justify-center w-full text-slate-500 h-[300px] py-4">
               No reviews available
             </p>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              {/* Table for large screens */}
+              <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
                   <thead>
-                    <tr className="bg-gray-100 text-center text-gray-700 ">
+                    <tr className="bg-gray-100 text-center text-gray-700">
                       <th className="p-4">#</th>
                       <th className="p-4">Semester</th>
                       <th className="p-4">Course</th>
@@ -196,22 +204,33 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <td className="p-2">
                           {review.start_at}-{review.end_at}
                         </td>
-                        <td className="p-2 max-w-xs text-start relative group">
+                        <td className="p-2 max-w-xs text-start">
                           <div className="line-clamp-2 overflow-hidden text-ellipsis">
                             {review.review}
                           </div>
                         </td>
-
-                        <td className="p-2 text-center space-x-3 text-nowrap">
+                        <td className="py-2 px-4 text-center space-x-6">
                           <button
-                            onClick={() => alert(`Edit review ${review.id}`)}
-                            className="text-default-green hover:underline text-sm font-medium"
+                            onClick={() => {
+                              setReview({
+                                id: review.id,
+                                review: review.review,
+                              });
+                              setActiveModalId(`view-review`);
+                            }}
+                            className="text-default-green hover:underline text-lg font-medium cursor-pointer"
                           >
                             <MdOutlineRemoveRedEye />
                           </button>
                           <button
-                            onClick={() => alert(`Edit review ${review.id}`)}
-                            className="text-default-yellow hover:underline text-sm font-medium"
+                            onClick={() => {
+                              setReview({
+                                id: review.id,
+                                review: review.review,
+                              });
+                              setActiveModalId(`edit-review`);
+                            }}
+                            className="text-default-yellow hover:underline text-lg font-medium cursor-pointer"
                           >
                             <FaRegEdit />
                           </button>
@@ -222,8 +241,72 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 </table>
               </div>
 
-              {/* Pagination */}
+              {/* Cards for small/medium screens */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden">
+                {currentReviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-semibold text-gray-800 text-sm">
+                        {review.lecture}
+                      </h4>
+                      <div className="flex space-x-3 text-lg">
+                        <button
+                          onClick={() => {
+                            setReview({ id: review.id, review: review.review });
+                            setActiveModalId(`view-review`);
+                          }}
+                          className="text-default-green hover:text-green-700"
+                        >
+                          <MdOutlineRemoveRedEye />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReview({ id: review.id, review: review.review });
+                            setActiveModalId(`edit-review`);
+                          }}
+                          className="text-default-yellow hover:text-yellow-600"
+                        >
+                          <FaRegEdit />
+                        </button>
+                      </div>
+                    </div>
 
+                    <p className="text-gray-600 text-sm mb-1">
+                      <span className="font-medium text-gray-700">
+                        Teacher:
+                      </span>{" "}
+                      {review.teacher_fullname}
+                    </p>
+                    <p className="text-gray-600 text-sm mb-1">
+                      <span className="font-medium text-gray-700">
+                        Semester:
+                      </span>{" "}
+                      {review.semester}
+                    </p>
+                    <p className="text-gray-600 text-sm mb-1">
+                      <span className="font-medium text-gray-700">Period:</span>{" "}
+                      {review.class_period.replace("_", " ")}
+                    </p>
+                    <p className="text-gray-600 text-sm mb-2">
+                      <span className="font-medium text-gray-700">Time:</span>{" "}
+                      {review.start_at} - {review.end_at}
+                    </p>
+                    <div>
+                      <span className="font-medium text-gray-700">
+                        Feedback:
+                      </span>{" "}
+                      <p className="bg-gray-50 rounded-md p-2 text-gray-700 text-sm line-clamp-2">
+                        {review.review}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
               <div className="mt-4">
                 <Pagination
                   currentPage={currentPage}
@@ -236,10 +319,10 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
       </div>
       <CenterModal id={"view-review"}>
-        <CreateReviewForm classId={classRooms?.id} />
+        <ViewReview review={review.review} />
       </CenterModal>
       <CenterModal id={"edit-review"}>
-        <CreateReviewForm classId={classRooms?.id} />
+        <EditReviewForm reviewId={review.id} />
       </CenterModal>
       <CenterModal id={"create-review"}>
         <CreateReviewForm classId={classRooms?.id} />
