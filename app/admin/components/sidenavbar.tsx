@@ -6,13 +6,13 @@ import { PiStudentFill } from "react-icons/pi";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { IoMdLogOut } from "react-icons/io";
-import { Logout } from "../../utils/functions/logout";
 import { useAppContext } from "../../context";
 import Link from "next/link";
 import { SiGoogleclassroom } from "react-icons/si";
 import { VscFeedback } from "react-icons/vsc";
 import { RiAdminFill } from "react-icons/ri";
 import { GetProfileApi } from "@/app/api/students/action";
+import { Logout } from "@/app/api/auth/logout";
 
 const SideBarNav = () => {
   const today = new Date().toLocaleDateString("en-GB", {

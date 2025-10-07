@@ -62,13 +62,13 @@ export const CreateReviewApi = async (
   const api = createAxiosInstance(token);
   try {
     const response = await api.post(`/v1/reviews/${classId}`, reviewdata);
-    console.log({ reviewdata, response });
+
     const data = response.data;
-    console.log({ data });
+
     if (response.data) {
       return { success: true, data: data };
     } else {
-      return { success: false, error: {message:response.statusText} };
+      return { success: false, error: { message: response.statusText } };
     }
   } catch (error: any) {
     return { success: false, error: error.response?.data || error.message };

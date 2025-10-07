@@ -43,7 +43,7 @@ export default function CreateReviewForm({ classId }: { classId?: number }) {
   const onSubmit = async (data: CreateReviewFormValues) => {
     try {
       const result = await CreateReviewApi(data, classId);
-      console.log({ result });
+
       if (result.success) {
         setActiveModalId(null);
         router.refresh();
