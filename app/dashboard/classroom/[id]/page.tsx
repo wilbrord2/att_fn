@@ -322,7 +322,10 @@ const ClassRoomPage = ({ params }: { params: Promise<{ id: string }> }) => {
         <ViewReview review={review.review} />
       </CenterModal>
       <CenterModal id={"edit-review"}>
-        <EditReviewForm reviewId={review.id} />
+        <EditReviewForm
+          reviewId={review.id}
+          classId={classRooms?.id}
+        />
       </CenterModal>
       <CenterModal id={"create-review"}>
         <CreateReviewForm classId={classRooms?.id} />

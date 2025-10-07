@@ -164,7 +164,7 @@ const StudentManagement = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {paginatedStudents.map((student) => (
-                    <tr key={student.id} className="">
+                    <tr key={student.id} className=" font-light text-sm">
                       <td className="px-4 py-2">{student.id}</td>
                       <td className="px-4 py-2">{student.name}</td>
                       <td className="px-4 py-2">{student.email}</td>

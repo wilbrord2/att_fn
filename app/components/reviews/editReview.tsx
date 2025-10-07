@@ -27,7 +27,13 @@ const reviewSchema = z.object({
 
 export type EditReviewFormValues = z.infer<typeof reviewSchema>;
 
-export default function EditReviewForm({ reviewId }: { reviewId: number }) {
+export default function EditReviewForm({
+  reviewId,
+  classId,
+}: {
+  reviewId: number;
+  classId?: number;
+}) {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setActiveModalId } = useAppContext();
@@ -46,7 +52,7 @@ export default function EditReviewForm({ reviewId }: { reviewId: number }) {
 
   const onSubmit = async (data: EditReviewFormValues) => {
     try {
-      const result = await EditReviewApi(data, reviewId);
+      const result = await EditReviewApi({ ...data, classId }, reviewId);
 
       if (result.success && result.data) {
         setErrorMessage(result.data.message);
@@ -57,7 +63,7 @@ export default function EditReviewForm({ reviewId }: { reviewId: number }) {
         }, 3000);
         return () => clearTimeout(timer);
       } else {
-        setErrorMessage("Failed to update review");
+        setErrorMessage(result.error?.message||"Failed to update review");
       }
     } catch (error) {
       setErrorMessage("Error updating review");

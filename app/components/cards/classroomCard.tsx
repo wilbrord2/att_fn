@@ -40,8 +40,8 @@ const ClassCard: React.FC<ClassCardProps> = ({
           <span
             className={`${
               status.toLocaleLowerCase() === "pending"
-                ? "text-yellow-700"
-                : status.toLocaleLowerCase() === "active"
+                ? "text-yellow-500"
+                : status.toLocaleLowerCase() === "approved"
                 ? "text-green-700"
                 : "text-red-700"
             } text-sm font-semibold `}
