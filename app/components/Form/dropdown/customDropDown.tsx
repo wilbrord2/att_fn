@@ -35,7 +35,7 @@ const CustomDropDown: FC<CustomDropDownProps> = ({
   }, []);
 
   return (
-    <div ref={dropdownRef} className="relative w-full min-w-[120px]">
+    <div ref={dropdownRef} className="relative w-full min-w-[200px]">
       {/* Trigger */}
       <button
         type="button"
@@ -44,9 +44,11 @@ const CustomDropDown: FC<CustomDropDownProps> = ({
       >
         <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
           {selected ? (
-            <span className="font-semibold text-base">{selected}</span>
+            <span className="font-semibold text-base text-nowrap">
+              {selected}
+            </span>
           ) : (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-gray-400 text-nowrap">{placeholder}</span>
           )}
         </div>
         <span>{isOpen ? <IoChevronUp /> : <IoChevronDown />}</span>

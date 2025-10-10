@@ -10,6 +10,7 @@ import ErrorCard from "@/app/components/Form/error";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import { ClassReviewType } from "@/app/utils/types/review";
 import { GetAllReviewsApi } from "@/app/api/reviewsApi/action";
+import CustomDropDown from "@/app/components/Form/dropdown/customDropDown";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -21,15 +22,12 @@ const FeedbackManagement = () => {
   const [loading, setLoading] = useState(true);
   const [openRowId, setOpenRowId] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [selectedPeriod, setSelectedPeriod] = useState("");
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [statusFilter, setStatusFilter] = useState(
-    searchParams.get("status") || ""
-  );
-  const [yearFilter, setYearFilter] = useState(searchParams.get("year") || "");
-  const [currentPage, setCurrentPage] = useState(
-    Number(searchParams.get("page")) || 1
-  );
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleGetAllReviews = async () => {
     try {
@@ -50,14 +48,17 @@ const FeedbackManagement = () => {
     handleGetAllReviews();
   }, []);
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (statusFilter) params.set("status", statusFilter);
-    if (yearFilter) params.set("year", yearFilter);
-    if (currentPage !== 1) params.set("page", currentPage.toString());
-    router.replace(`?${params.toString()}`);
-  }, [search, statusFilter, yearFilter, currentPage, router]);
+  const handleClearFilters = () => {
+    setSearch("");
+    setStatusFilter("");
+    setYearFilter("");
+    setSelectedPeriod("");
+    setCurrentPage(1);
+    router.replace("");
+  };
+
+  const hasActiveFilter =
+    search || statusFilter || yearFilter || selectedPeriod;
 
   const toggleAccordion = (id: number) => {
     setOpenRowId((prev) => (prev === id ? null : id));
@@ -67,11 +68,13 @@ const FeedbackManagement = () => {
     return reviews
       .filter((r) => {
         const searchLower = search.toLowerCase();
-        const matchesSearch =
-          r.teacher_fullname.toLowerCase().includes(searchLower) ||
-          r.lecture.toLowerCase().includes(searchLower) ||
-          r.user.name.toLowerCase().includes(searchLower) ||
-          r.classroom.department.toLowerCase().includes(searchLower);
+
+        const matchesSearch = search
+          ? r.teacher_fullname.toLowerCase().includes(searchLower) ||
+            r.lecture.toLowerCase().includes(searchLower) ||
+            r.user.name.toLowerCase().includes(searchLower) ||
+            r.classroom.department.toLowerCase().includes(searchLower)
+          : true;
 
         const matchesStatus = statusFilter
           ? r.classroom.class_status
@@ -85,13 +88,51 @@ const FeedbackManagement = () => {
               .includes(yearFilter.toLowerCase())
           : true;
 
-        return matchesSearch && matchesStatus && matchesYear;
+        let matchesType = true;
+        if (selectedPeriod) {
+          const createdAt = new Date(r.created_at);
+          const now = new Date();
+          switch (selectedPeriod) {
+            case "Daily": {
+              const yesterday = new Date(now);
+              yesterday.setDate(now.getDate() - 1);
+              matchesType = createdAt >= yesterday && createdAt <= now;
+              break;
+            }
+            case "Weekly": {
+              const weekAgo = new Date(now);
+              weekAgo.setDate(now.getDate() - 7);
+              matchesType = createdAt >= weekAgo && createdAt <= now;
+              break;
+            }
+            case "Monthly": {
+              const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+              const endDate = new Date(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                1
+              );
+              matchesType = createdAt >= startDate && createdAt < endDate;
+              break;
+            }
+            case "Yearly": {
+              const yearAgo = new Date(now);
+              yearAgo.setFullYear(now.getFullYear() - 1);
+              matchesType = createdAt >= yearAgo && createdAt <= now;
+              break;
+            }
+            default:
+              matchesType = true;
+          }
+        }
+
+        return matchesSearch && matchesStatus && matchesYear && matchesType;
       })
       .sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
-  }, [reviews, search, statusFilter, yearFilter]);
+  }, [reviews, search, statusFilter, yearFilter, selectedPeriod]);
 
   const totalPages = Math.ceil(filteredReviews.length / ITEMS_PER_PAGE);
   const paginatedReviews = filteredReviews.slice(
@@ -117,41 +158,42 @@ const FeedbackManagement = () => {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="border px-3 py-2 rounded-md w-full md:w-1/3 text-sm"
+            className="border px-3 py-4 rounded-md w-full md:w-1/3 text-sm"
           />
 
-          <div className="flex gap-3 flex-wrap">
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
+          <div className="flex gap-3 w-full md:w-auto">
+            <CustomDropDown
+              items={["Daily", "Weekly", "Monthly", "Yearly"]}
+              placeholder="Select review period"
+              selected={selectedPeriod}
+              onChange={(value) => {
+                setSelectedPeriod(
+                  value === "Select review period" ? "" : value
+                );
                 setCurrentPage(1);
               }}
-              className="border px-3 py-2 rounded-md text-sm"
-            >
-              <option value="">Sort by Status</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="PENDING">Pending</option>
-            </select>
+            />
 
-            <select
-              value={yearFilter}
-              onChange={(e) => {
-                setYearFilter(e.target.value);
+            <CustomDropDown
+              items={[
+                ...new Set(reviews.map((r) => r.classroom.academic_year)),
+              ]}
+              placeholder="Sort by Academic Year"
+              selected={yearFilter}
+              onChange={(value) => {
+                setYearFilter(value === "Sort by Academic Year" ? "" : value);
                 setCurrentPage(1);
               }}
-              className="border px-3 py-2 rounded-md text-sm"
-            >
-              <option value="">Sort by Academic Year</option>
-              {[...new Set(reviews.map((r) => r.classroom.academic_year))].map(
-                (year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                )
-              )}
-            </select>
+            />
+            {/* Clear Filter Button */}
+            {hasActiveFilter && (
+              <button
+                onClick={handleClearFilters}
+                className="text-sm text-red-600 underline text-nowrap hover:text-red-800"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
 
@@ -164,13 +206,12 @@ const FeedbackManagement = () => {
             <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-2xl">
               <thead className="bg-gray-200 text-slate-800">
                 <tr>
-                  <th className="px-4 py-2 text-left">#</th>
+                  <th className="px-4 py-2 text-left">Review Id</th>
                   <th className="px-4 py-2 text-left">Course</th>
                   <th className="px-4 py-2 text-left">Teacher</th>
-                  <th className="px-4 py-2 text-left">Class_Rep</th>
+                  <th className="px-4 py-2 text-left">Class Rep</th>
                   <th className="px-4 py-2 text-left">Department</th>
-                  <th className="px-4 py-2 text-left">Class lebel</th>
-                  <th className="px-4 py-2 text-left">Class Status</th>
+                  <th className="px-4 py-2 text-left">Class Label</th>
                   <th className="px-4 py-2 text-left">Created At</th>
                 </tr>
               </thead>
@@ -192,15 +233,6 @@ const FeedbackManagement = () => {
                         <td className="p-4">{review.user.name}</td>
                         <td className="p-4">{review.classroom.department}</td>
                         <td className="p-4">{review.classroom.class_label}</td>
-                        <td className="p-4 font-semibold">
-                          {review.classroom.class_status === "APPROVED" ? (
-                            <span className="text-green-600">APPROVED</span>
-                          ) : review.classroom.class_status === "REJECTED" ? (
-                            <span className="text-red-600">REJECTED</span>
-                          ) : (
-                            <span className="text-yellow-600">PENDING</span>
-                          )}
-                        </td>
                         <td className="p-4">
                           {new Date(review.created_at).toLocaleString()}
                         </td>
@@ -216,7 +248,7 @@ const FeedbackManagement = () => {
                               <p className="text-gray-700 leading-relaxed">
                                 {review.review}
                               </p>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700 text-sm">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
                                 <p>
                                   <strong>Semester:</strong> {review.semester}
                                 </p>
