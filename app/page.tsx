@@ -39,7 +39,7 @@ export default function LoginForm() {
       if (result.success) {
         router.push("/dashboard");
       } else {
-        setErrorMessage(result.error.message || "Incorrect phone or password");
+        setErrorMessage(result.error.message || "Incorrect Email or Password");
       }
     } catch (error) {
       setErrorMessage("Error signing in");
